@@ -4,7 +4,7 @@
 
 # Data (PDFs can be large — don't commit them)
 data/raw/
-data/processed/
+# data/processed/
 
 # Python
 __pycache__/
@@ -15,9 +15,9 @@ venv/
 env/
 
 # Vector store (regenerate from papers)
-*.faiss
-*.pkl
-*.index
+# *.faiss
+# *.pkl
+# *.index
 
 # Jupyter
 .ipynb_checkpoints/
