@@ -182,9 +182,17 @@ export default function ChatApp() {
                 </div>
                 <div className="message-bubble">
                   {msg.role === 'assistant' ? (
-                    <div className="markdown">
-                      <ReactMarkdown>{msg.content}</ReactMarkdown>
-                    </div>
+                    msg.content ? (
+                      <div className="markdown">
+                        <ReactMarkdown>{msg.content}</ReactMarkdown>
+                      </div>
+                    ) : (
+                      <div className="thinking-indicator">
+                        <span className="dot"></span>
+                        <span className="dot"></span>
+                        <span className="dot"></span>
+                      </div>
+                    )
                   ) : (
                     <div>{msg.content}</div>
                   )}
@@ -214,18 +222,6 @@ export default function ChatApp() {
                 </div>
               </div>
             ))}
-            {isLoading && messages[messages.length - 1]?.role === "user" && (
-              <div className="chat-message assistant">
-                <div className="message-avatar"><Bot size={18} className="text-[#8a63f7]" /></div>
-                <div className="message-bubble">
-                  <div className="thinking-indicator">
-                    <span className="dot"></span>
-                    <span className="dot"></span>
-                    <span className="dot"></span>
-                  </div>
-                </div>
-              </div>
-            )}
             <div ref={messagesEndRef} />
           </div>
         )}
