@@ -2,18 +2,24 @@
 
 import React, { useRef, useMemo } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
+import { OrbitControls } from "@react-three/drei";
 import * as THREE from "three";
 
 // Central glowing network globe
 function Globe() {
   const globeRef = useRef<THREE.Group>(null);
 
-  // Slow, cinematic rotation on both axes
-  useFrame(({ clock }) => {
+  // Slow, cinematic rotation + mouse parallax tilt
+  useFrame(({ clock, pointer }) => {
     const elapsedTime = clock.getElapsedTime();
     if (globeRef.current) {
-      globeRef.current.rotation.y = elapsedTime * 0.12;
-      globeRef.current.rotation.x = elapsedTime * 0.04;
+      // Base auto-rotation
+      const targetRotationY = elapsedTime * 0.12 + pointer.x * 0.4;
+      const targetRotationX = elapsedTime * 0.04 - pointer.y * 0.3;
+
+      // Smoothly interpolate (lerp) to the target rotation for high-fidelity response
+      globeRef.current.rotation.y = THREE.MathUtils.lerp(globeRef.current.rotation.y, targetRotationY, 0.05);
+      globeRef.current.rotation.x = THREE.MathUtils.lerp(globeRef.current.rotation.x, targetRotationX, 0.05);
     }
   });
 
@@ -159,12 +165,13 @@ function ParticleCloud() {
 
 export default function DataSphere() {
   return (
-    <div style={{ width: "100%", height: "100%", position: "absolute", top: 0, left: 0, zIndex: 1, pointerEvents: "none" }}>
+    <div style={{ width: "100%", height: "100%", position: "absolute", top: 0, left: 0, zIndex: 1, pointerEvents: "auto" }}>
       <Canvas camera={{ position: [0, 0, 5.5], fof: 60 } as any} gl={{ antialias: true }}>
         <ambientLight intensity={0.4} />
         <pointLight position={[10, 10, 10]} intensity={1.2} />
         <Globe />
         <ParticleCloud />
+        <OrbitControls enableZoom={false} enablePan={false} rotateSpeed={0.7} />
       </Canvas>
     </div>
   );
