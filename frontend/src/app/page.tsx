@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { 
-  Image as ImageIcon, Globe, Send, Bot, User, FileText, ExternalLink, Database, BookOpen
+  Image as ImageIcon, Globe, Send, Bot, User, FileText, ExternalLink, Database, BookOpen, Menu, X
 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import dynamic from "next/dynamic";
@@ -31,6 +31,7 @@ export default function ChatApp() {
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [greeting, setGreeting] = useState("Hello, Researcher.");
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -51,6 +52,8 @@ export default function ChatApp() {
 
   const handleSend = async (text: string = input) => {
     if (!text.trim() || isLoading) return;
+    
+    setIsSidebarOpen(false); // Auto-close sidebar on mobile
 
     const userMessage: Message = { id: Date.now().toString(), role: "user", content: text };
     setMessages((prev) => [...prev, userMessage]);
@@ -129,8 +132,17 @@ export default function ChatApp() {
 
   return (
     <div className="app-container">
-      <div className="sidebar">
-        <div className="brand-title">ML Research Assistant</div>
+      {isSidebarOpen && (
+        <div className="sidebar-backdrop" onClick={() => setIsSidebarOpen(false)} />
+      )}
+      
+      <div className={`sidebar ${isSidebarOpen ? "open" : ""}`}>
+        <div className="sidebar-header">
+          <div className="brand-title">ML Research Assistant</div>
+          <button className="sidebar-close-btn" onClick={() => setIsSidebarOpen(false)}>
+            <X size={18} />
+          </button>
+        </div>
         
         <div className="stats-row">
           <div className="stat-box">
@@ -161,6 +173,9 @@ export default function ChatApp() {
 
       {/* MAIN CONTENT */}
       <div className="main-area">
+        <button className="mobile-toggle-btn" onClick={() => setIsSidebarOpen(true)}>
+          <Menu size={20} />
+        </button>
         {messages.length === 0 ? (
           <div className="hero-section">
             <div className="orb-container">

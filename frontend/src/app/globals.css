@@ -572,3 +572,189 @@ body {
     opacity: 1;
   }
 }
+
+/* RESPONSIVE DESIGN HELPERS (DESKTOP FIRST DEFAULTS) */
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.sidebar-close-btn {
+  display: none;
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 0.25rem;
+  border-radius: 50%;
+  transition: all 0.2s;
+}
+
+.sidebar-close-btn:hover {
+  color: var(--text-primary);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.mobile-toggle-btn {
+  display: none;
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  z-index: 5;
+  background: var(--bg-card);
+  border: 1px solid var(--border-light);
+  color: var(--text-primary);
+  padding: 0.6rem;
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  transition: all 0.2s;
+}
+
+.mobile-toggle-btn:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: var(--border-hover);
+}
+
+.sidebar-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(11, 12, 16, 0.7);
+  backdrop-filter: blur(4px);
+  z-index: 99;
+  animation: fadeIn 0.25s ease-out;
+}
+
+/* ── MOBILE MEDIA QUERIES ────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  body {
+    overflow-y: auto; /* Allow overflow if needed */
+  }
+
+  .app-container {
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  /* Slide-out Sidebar Drawer */
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    width: 290px;
+    z-index: 100;
+    transform: translateX(-100%);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 10px 0 30px rgba(0, 0, 0, 0.5);
+  }
+
+  .sidebar.open {
+    transform: translateX(0);
+  }
+
+  .sidebar-close-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .mobile-toggle-btn {
+    display: flex;
+  }
+
+  /* Main Area Adjustments */
+  .main-area {
+    padding-top: 3.5rem; /* Space for the floating toggle button */
+    height: 100vh;
+  }
+
+  /* Scale Globe Container */
+  .orb-container {
+    width: 230px;
+    height: 230px;
+    margin-bottom: 1rem;
+  }
+
+  .orb-glow {
+    width: 260px;
+    height: 260px;
+  }
+
+  /* Scale Greeting Font Sizes */
+  .greeting-text h1, .greeting-text h2 {
+    font-size: 1.5rem !important;
+  }
+
+  .greeting-text {
+    padding: 0 1.5rem;
+  }
+
+  /* Stacking features cards */
+  .cards-row {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+    max-height: 180px;
+    overflow-y: auto;
+    padding-right: 0.25rem;
+  }
+
+  .feature-card {
+    padding: 0.85rem 1rem;
+  }
+
+  .feature-card h3 {
+    font-size: 0.85rem;
+    margin-bottom: 0.25rem;
+  }
+
+  .feature-card p {
+    font-size: 0.75rem;
+  }
+
+  /* Chat list adjustments */
+  .chat-scroll-area {
+    padding: 1rem 1rem 0;
+    gap: 1.25rem;
+  }
+
+  .chat-message {
+    gap: 0.75rem;
+  }
+
+  .message-bubble {
+    max-width: 90%;
+    font-size: 0.88rem;
+  }
+
+  /* Bottom Input section */
+  .bottom-section {
+    padding: 1rem;
+    gap: 1rem;
+  }
+
+  .input-wrapper {
+    padding: 0.85rem 1rem;
+    border-radius: 12px;
+  }
+
+  .input-wrapper textarea {
+    font-size: 0.9rem;
+    height: 36px;
+    margin-bottom: 0.5rem;
+  }
+
+  .action-chips {
+    display: none; /* Hide helper chips on mobile for layout cleanliness */
+  }
+
+  .right-actions {
+    width: 100%;
+    justify-content: flex-end;
+  }
+}
