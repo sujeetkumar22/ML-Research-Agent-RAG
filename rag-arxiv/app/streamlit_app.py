@@ -252,8 +252,8 @@ with tab_chat:
 with tab_papers:
     st.markdown("### 📚 Papers in the Knowledge Base")
 
-    # Load metadata
-    meta_path = Path("data/raw/papers_metadata.json")
+    from config import DATA_RAW
+    meta_path = DATA_RAW / "papers_metadata.json"
     if meta_path.exists():
         with open(meta_path) as f:
             papers = json.load(f)
@@ -295,8 +295,8 @@ with tab_eval:
         "[RAGAS framework](https://docs.ragas.io)."
     )
 
-    # Load saved results if they exist
-    eval_path = Path("data/processed/eval_results.json")
+    from config import DATA_PROCESSED
+    eval_path = DATA_PROCESSED / "eval_results.json"
     if eval_path.exists():
         with open(eval_path) as f:
             scores = json.load(f)
