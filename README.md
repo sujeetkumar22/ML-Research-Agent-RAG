@@ -4,7 +4,7 @@ emoji: 🤖
 colorFrom: blue
 colorTo: purple
 sdk: streamlit
-sdk_version: 1.35.0
+sdk_version: 1.39.0
 app_file: rag-arxiv/app/streamlit_app.py
 pinned: false
 ---
