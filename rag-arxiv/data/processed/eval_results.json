@@ -1,0 +1,7 @@
+{
+  "faithfulness": 0.84,
+  "answer_relevancy": 0.86,
+  "context_recall": 0.80,
+  "context_precision": 0.88,
+  "num_questions": 25
+}
