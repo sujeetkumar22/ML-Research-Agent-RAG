@@ -5,6 +5,9 @@ import {
   Image as ImageIcon, Globe, Send, Bot, User, FileText, ExternalLink, Database, BookOpen
 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
+import dynamic from "next/dynamic";
+
+const DataSphere = dynamic(() => import("./components/DataSphere"), { ssr: false });
 
 interface Source {
   text: string;
@@ -27,7 +30,16 @@ export default function ChatApp() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [greeting, setGreeting] = useState("Hello, Researcher.");
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const hour = new Date().getHours();
+    if (hour >= 5 && hour < 12) setGreeting("Good Morning, Researcher.");
+    else if (hour >= 12 && hour < 17) setGreeting("Good Afternoon, Researcher.");
+    else if (hour >= 17 && hour < 21) setGreeting("Good Evening, Researcher.");
+    else setGreeting("Good Night, Researcher.");
+  }, []);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -153,12 +165,12 @@ export default function ChatApp() {
           <div className="hero-section">
             <div className="orb-container">
               <div className="orb-glow"></div>
-              <div className="orb"></div>
+              <DataSphere />
             </div>
             
             <div className="greeting-text">
-              <h1>Good Evening, Researcher.</h1>
-              <h2>Can I help you with anything ?</h2>
+              <h1>{greeting}</h1>
+              <h2>Can I help you with anything?</h2>
             </div>
           </div>
         ) : (
@@ -205,7 +217,13 @@ export default function ChatApp() {
             {isLoading && messages[messages.length - 1]?.role === "user" && (
               <div className="chat-message assistant">
                 <div className="message-avatar"><Bot size={18} className="text-[#8a63f7]" /></div>
-                <div className="message-bubble text-[var(--text-secondary)]">Thinking...</div>
+                <div className="message-bubble">
+                  <div className="thinking-indicator">
+                    <span className="dot"></span>
+                    <span className="dot"></span>
+                    <span className="dot"></span>
+                  </div>
+                </div>
               </div>
             )}
             <div ref={messagesEndRef} />

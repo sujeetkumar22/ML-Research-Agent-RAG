@@ -35,12 +35,14 @@ body {
   overflow: hidden;
 }
 
-/* LAYOUT */
 .app-container {
   display: flex;
   height: 100vh;
   width: 100vw;
-  background-image: radial-gradient(circle at 50% 30%, rgba(138, 99, 247, 0.05) 0%, transparent 60%);
+  background-color: #0b0c10;
+  background-image: 
+    radial-gradient(circle at 50% 40%, rgba(138, 99, 247, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 20% 80%, rgba(45, 212, 191, 0.04) 0%, transparent 40%);
 }
 
 /* SIDEBAR */
@@ -245,34 +247,17 @@ body {
 
 .orb-container {
   position: relative;
-  width: 120px;
-  height: 120px;
-  margin-bottom: 2rem;
+  width: 320px;
+  height: 320px;
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   animation: float 6s ease-in-out infinite;
 }
 
 .orb {
-  width: 100%;
-  height: 100%;
-  border-radius: 50%;
-  background: radial-gradient(circle at 30% 30%, var(--accent-orb-1), var(--accent-orb-2), var(--bg-dark));
-  box-shadow: 
-    0 0 40px rgba(138, 99, 247, 0.4),
-    inset 0 0 20px rgba(255,255,255,0.2);
-  position: relative;
-  z-index: 2;
-  overflow: hidden;
-}
-
-.orb::before {
-  content: '';
-  position: absolute;
-  top: -50%;
-  left: -50%;
-  width: 200%;
-  height: 200%;
-  background: conic-gradient(transparent, rgba(255,255,255,0.3), transparent);
-  animation: rotate 10s linear infinite;
+  display: none; /* Replaced by 3D DataSphere */
 }
 
 .orb-glow {
@@ -280,12 +265,13 @@ body {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 160px;
-  height: 160px;
-  background: radial-gradient(circle, rgba(138, 99, 247, 0.15) 0%, transparent 70%);
+  width: 360px;
+  height: 360px;
+  background: radial-gradient(circle, rgba(138, 99, 247, 0.16) 0%, rgba(45, 212, 191, 0.04) 50%, transparent 70%);
   border-radius: 50%;
-  z-index: 1;
+  z-index: 0;
   animation: pulseGlow 4s ease-in-out infinite;
+  pointer-events: none;
 }
 
 .greeting-text {
@@ -542,4 +528,47 @@ body {
 }
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(255,255,255,0.2);
+}
+
+/* AI Thinking Indicator */
+.thinking-indicator {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.03);
+  padding: 0.6rem 1.1rem;
+  border-radius: 14px;
+  border: 1px solid var(--border-light);
+  width: fit-content;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.thinking-indicator .dot {
+  width: 7px;
+  height: 7px;
+  background: var(--accent-orb-2);
+  border-radius: 50%;
+  opacity: 0.35;
+  animation: thinkingDots 1.4s infinite ease-in-out;
+}
+
+.thinking-indicator .dot:nth-child(2) {
+  animation-delay: 0.2s;
+  background: var(--accent-orb-1);
+}
+
+.thinking-indicator .dot:nth-child(3) {
+  animation-delay: 0.4s;
+  background: var(--accent-orb-3);
+}
+
+@keyframes thinkingDots {
+  0%, 100% {
+    transform: scale(0.85);
+    opacity: 0.35;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 1;
+  }
 }
