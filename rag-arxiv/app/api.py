@@ -2,7 +2,7 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import List, Optional, Dict, Any
-from fastapi.responses import StreamingResponse
+from fastapi.responses import HTMLResponse, StreamingResponse
 import json
 
 from src.retrieval.vector_store import VectorStore
@@ -57,6 +57,79 @@ async def startup_event():
         get_rag_system()
     except Exception as e:
         print(f"Warning during startup: {e}")
+
+@app.get("/", response_class=HTMLResponse)
+def root_endpoint():
+    return """
+    <html>
+        <head>
+            <title>ML Research Agent API</title>
+            <style>
+                body {
+                    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+                    background-color: #0b0c10;
+                    color: #ffffff;
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    justify-content: center;
+                    height: 100vh;
+                    margin: 0;
+                }
+                .container {
+                    text-align: center;
+                    padding: 2.5rem;
+                    border-radius: 16px;
+                    background-color: rgba(255, 255, 255, 0.03);
+                    border: 1px solid rgba(255, 255, 255, 0.08);
+                    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
+                    max-width: 480px;
+                }
+                h1 {
+                    color: #8a63f7;
+                    margin-bottom: 0.75rem;
+                    font-size: 1.8rem;
+                }
+                p {
+                    color: #9ca3af;
+                    line-height: 1.6;
+                    margin-bottom: 2rem;
+                    font-size: 0.95rem;
+                }
+                .status {
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 6px;
+                    padding: 0.4rem 1rem;
+                    border-radius: 20px;
+                    background-color: rgba(45, 212, 191, 0.1);
+                    color: #2dd4bf;
+                    font-size: 0.85rem;
+                    font-weight: 600;
+                }
+                .dot {
+                    width: 8px;
+                    height: 8px;
+                    background-color: #2dd4bf;
+                    border-radius: 50%;
+                    display: inline-block;
+                    animation: pulse 1.8s infinite ease-in-out;
+                }
+                @keyframes pulse {
+                    0%, 100% { transform: scale(0.8); opacity: 0.5; }
+                    50% { transform: scale(1.2); opacity: 1; }
+                }
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <h1>ML Research Agent RAG API</h1>
+                <p>The backend API is running successfully on Hugging Face Spaces! Point your Next.js Vercel frontend to this space URL to query papers.</p>
+                <div class="status"><span class="dot"></span> API Status: Live</div>
+            </div>
+        </body>
+    </html>
+    """
 
 @app.get("/health")
 def health_check():
