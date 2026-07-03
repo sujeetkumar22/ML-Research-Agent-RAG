@@ -5,6 +5,7 @@ colorFrom: blue
 colorTo: purple
 sdk: streamlit
 sdk_version: 1.39.0
+python_version: 3.10
 app_file: rag-arxiv/app/streamlit_app.py
 pinned: false
 ---
