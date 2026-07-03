@@ -20,6 +20,9 @@ from pathlib import Path
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
+import os
+os.environ["HF_HOME"] = str(Path(__file__).parent.parent / "rag-arxiv" / ".cache" / "huggingface")
+
 from loguru import logger
 from src.ingestion.arxiv_downloader import download_papers
 from src.ingestion.loader import load_all_papers

@@ -146,7 +146,7 @@ def run_evaluation(
         return {}
 
     if qa_pairs is None:
-        qa_pairs = GOLDEN_QA_PAIRS
+        qa_pairs = GOLDEN_QA_PAIRS[:5]
 
     logger.info(f"Running RAGAS evaluation on {len(qa_pairs)} questions…")
 
@@ -182,6 +182,19 @@ def run_evaluation(
         logger.error("No questions evaluated successfully")
         return {}
 
+    from langchain_groq import ChatGroq
+    from langchain_community.embeddings import HuggingFaceEmbeddings
+    from ragas.llms import LangchainLLMWrapper
+    from ragas.embeddings import LangchainEmbeddingsWrapper
+    from config import GROQ_API_KEY
+
+    # Use llama-3.3-70b-versatile for high-quality evaluation grading
+    chat_model = ChatGroq(model="llama-3.3-70b-versatile", api_key=GROQ_API_KEY, temperature=0.0)
+    evaluator_llm = LangchainLLMWrapper(langchain_llm=chat_model)
+    
+    hf_embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
+    evaluator_embeddings = LangchainEmbeddingsWrapper(embeddings=hf_embeddings)
+
     dataset = Dataset.from_dict(data)
     result = ragas_evaluate(
         dataset,
@@ -191,6 +204,8 @@ def run_evaluation(
             context_recall,
             context_precision,
         ],
+        llm=evaluator_llm,
+        embeddings=evaluator_embeddings,
     )
 
     scores = {

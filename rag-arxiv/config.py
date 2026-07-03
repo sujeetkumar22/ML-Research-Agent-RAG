@@ -6,6 +6,9 @@ import os
 from pathlib import Path
 from dotenv import load_dotenv
 
+# Redirect HF cache to the E: drive workspace because C: drive is full
+os.environ["HF_HOME"] = str(Path(__file__).parent / ".cache" / "huggingface")
+
 load_dotenv()
 
 # ── Paths ────────────────────────────────────────
@@ -23,7 +26,7 @@ GROQ_API_KEY = os.getenv("GROQ_API_KEY", "")
 LLM_MODEL    = os.getenv("LLM_MODEL", "llama-3.1-8b-instant")
 
 # ── Embeddings ───────────────────────────────────
-EMBED_MODEL  = os.getenv("EMBED_MODEL", "sentence-transformers/all-MiniLM-L6-v2")
+EMBED_MODEL  = os.getenv("EMBED_MODEL", "BAAI/bge-base-en-v1.5")
 
 # ── Retrieval ────────────────────────────────────
 TOP_K        = int(os.getenv("TOP_K", 5))

@@ -1,6 +1,7 @@
 # Environment
 .env
 *.env
+.cache/
 
 # Data (PDFs can be large — don't commit them)
 data/raw/

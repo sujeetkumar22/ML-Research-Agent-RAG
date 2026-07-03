@@ -13,6 +13,7 @@ Interview talking point:
 import re
 from rank_bm25 import BM25Okapi
 from loguru import logger
+from sentence_transformers import CrossEncoder
 from src.retrieval.vector_store import VectorStore
 
 
@@ -38,6 +39,10 @@ class HybridRetriever:
         tokenized_corpus = [_tokenize(c["text"]) for c in chunks]
         self.bm25 = BM25Okapi(tokenized_corpus)
         logger.success(f"BM25 index ready ({len(chunks)} documents)")
+
+        logger.info("Loading Cross-Encoder reranker model (cross-encoder/ms-marco-MiniLM-L-6-v2)...")
+        self.reranker = CrossEncoder("cross-encoder/ms-marco-MiniLM-L-6-v2")
+        logger.success("Reranker model loaded successfully!")
 
     # ── BM25 SEARCH ──────────────────────────────────────────────────────────
 
@@ -115,21 +120,18 @@ class HybridRetriever:
         self,
         query: str,
         top_k: int = 5,
-        fetch_k: int = 20,   # fetch more candidates before RRF
+        fetch_k: int = 25,   # fetch more candidates before RRF
+        use_reranker: bool = True,
     ) -> list[dict]:
         """
-        Retrieve top_k most relevant chunks using hybrid search.
+        Retrieve top_k most relevant chunks using hybrid search and reranking.
 
         Steps:
         1. Dense search → top fetch_k candidates
         2. BM25 search  → top fetch_k candidates
         3. RRF fusion   → combined ranked list
-        4. Return top_k
-
-        Args:
-            query:   User's natural language question
-            top_k:   Number of final chunks to return
-            fetch_k: Candidates per method before fusion (should be > top_k)
+        4. Rerank top 20 candidates using Cross-Encoder
+        5. Return top_k
         """
         # 1. Dense retrieval
         dense = self.vector_store.search(query, top_k=fetch_k)
@@ -140,13 +142,30 @@ class HybridRetriever:
         # 3. Fuse
         fused = self._reciprocal_rank_fusion(dense, sparse)
 
-        # 4. Return top_k with formatted metadata
-        results = fused[:top_k]
+        # 4. Rerank if enabled
+        if use_reranker and hasattr(self, "reranker") and self.reranker is not None:
+            candidates = fused[:20]
+            if candidates:
+                pairs = [[query, c["text"]] for c in candidates]
+                scores = self.reranker.predict(pairs)
+                for idx, score in enumerate(scores):
+                    candidates[idx]["rerank_score"] = float(score)
+                # Sort by rerank score descending
+                candidates.sort(key=lambda x: x["rerank_score"], reverse=True)
+                results = candidates[:top_k]
+                logger.debug(
+                    f"Hybrid retrieve + Rerank: {len(dense)} dense + {len(sparse)} sparse "
+                    f"→ {len(fused)} fused → reranked top 20 → top {top_k} returned"
+                )
+            else:
+                results = []
+        else:
+            results = fused[:top_k]
+            logger.debug(
+                f"Hybrid retrieve: {len(dense)} dense + {len(sparse)} sparse "
+                f"→ {len(fused)} fused → top {top_k} returned"
+            )
 
-        logger.debug(
-            f"Hybrid retrieve: {len(dense)} dense + {len(sparse)} sparse "
-            f"→ {len(fused)} fused → top {top_k} returned"
-        )
         return results
 
     def retrieve_with_scores(self, query: str, top_k: int = 5) -> list[dict]:
