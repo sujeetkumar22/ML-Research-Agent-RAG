@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { 
-  Image as ImageIcon, Globe, Send, Bot, User, FileText, ExternalLink, Database, BookOpen, Menu, X
+  Image as ImageIcon, Globe, Send, Bot, User, FileText, ExternalLink, Database, BookOpen, Menu, X, Mic
 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import dynamic from "next/dynamic";
@@ -32,7 +32,10 @@ export default function ChatApp() {
   const [isLoading, setIsLoading] = useState(false);
   const [greeting, setGreeting] = useState("Hello, Researcher.");
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isListening, setIsListening] = useState(false);
+  
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const recognitionRef = useRef<any>(null);
 
   useEffect(() => {
     const hour = new Date().getHours();
@@ -41,6 +44,56 @@ export default function ChatApp() {
     else if (hour >= 17 && hour < 21) setGreeting("Good Evening, Researcher.");
     else setGreeting("Good Night, Researcher.");
   }, []);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+      if (SpeechRecognition) {
+        const recognition = new SpeechRecognition();
+        recognition.continuous = true;
+        recognition.interimResults = true;
+        recognition.lang = "en-US";
+
+        recognition.onresult = (event: any) => {
+          let transcript = "";
+          for (let i = event.resultIndex; i < event.results.length; i++) {
+            transcript += event.results[i][0].transcript;
+          }
+          setInput(transcript);
+        };
+
+        recognition.onerror = (event: any) => {
+          console.error("Speech recognition error:", event.error);
+          setIsListening(false);
+        };
+
+        recognition.onend = () => {
+          setIsListening(false);
+        };
+
+        recognitionRef.current = recognition;
+      }
+    }
+  }, []);
+
+  const toggleListening = () => {
+    if (!recognitionRef.current) {
+      alert("Speech recognition is not supported in this browser. Please try Google Chrome, Microsoft Edge, Safari, or Brave.");
+      return;
+    }
+
+    if (isListening) {
+      recognitionRef.current.stop();
+      setIsListening(false);
+    } else {
+      try {
+        recognitionRef.current.start();
+        setIsListening(true);
+      } catch (error) {
+        console.error("Failed to start speech recognition:", error);
+      }
+    }
+  };
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -264,6 +317,14 @@ export default function ChatApp() {
                 </div>
               </div>
               <div className="right-actions">
+                <button 
+                  className={`icon-btn ${isListening ? "listening" : ""}`}
+                  onClick={toggleListening}
+                  title={isListening ? "Stop listening" : "Voice search"}
+                  type="button"
+                >
+                  <Mic size={18} />
+                </button>
                 <button 
                   className="icon-btn primary ml-2" 
                   onClick={() => handleSend()}
